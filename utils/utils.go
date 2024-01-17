@@ -3,20 +3,19 @@ package utils
 import (
 	"fmt"
 	"math/rand"
-	"time"
 )
 
 const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 func init() {
 	fmt.Println("Seeding ...")
-	rand.Seed(time.Now().UnixNano())
+	// rand.Seed(time.Now().UnixNano())
 }
 
-func RandomNumber(max int) int {
+func RandomNumber(min int, max int) int {
 
 	// Generate a random integer between 0 and 100
-	return rand.Intn(max + 1)
+	return min + rand.Intn(max-min+1)
 }
 
 func RandomString(length int) string {
