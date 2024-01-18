@@ -1,0 +1,54 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: app-balancer-nodeport
+  namespace: frico
+  labels:
+    app: balancer
+spec:
+  selector:
+    app: app-balancer
+  ports:
+    - name: grpc
+      protocol: TCP
+      port: 50053
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: app-balancer
+  namespace: frico
+  name: balancer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-balancer
+  template:
+    metadata:
+      labels:
+        app: app-balancer
+      name: balancer
+    spec:
+      serviceAccountName: frico
+      containers:
+        - name: balancer
+          image: ghcr.io/nemcikjan/app-balancer:v20240117-c3dd524
+          imagePullPolicy: IfNotPresent
+          # readinessProbe:
+          #   httpGet:
+          #     path: /health
+          #     scheme: HTTPS
+          #     port: 443
+          #   initialDelaySeconds: 3
+          #   periodSeconds: 5
+          # livenessProbe:
+          #   httpGet:
+          #     path: /health
+          #     scheme: HTTPS
+          #     port: 443
+          #   initialDelaySeconds: 3
+          #   periodSeconds: 5
+      terminationGracePeriodSeconds: 10

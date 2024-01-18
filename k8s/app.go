@@ -126,8 +126,8 @@ func (c K8sAppClient) UpdateApp(id string, speed float64) {
 func createPod(id string) *corev1.Pod {
 	resourceRequirements := corev1.ResourceRequirements{
 		Requests: corev1.ResourceList{
-			corev1.ResourceCPU:    resource.MustParse(fmt.Sprintf("%dm", utils.RandomNumber(5, 500))),    // Request 500 milliCPUs
-			corev1.ResourceMemory: resource.MustParse(fmt.Sprintf("%dMi", utils.RandomNumber(10, 1000))), // Request 1 GiB of memory
+			corev1.ResourceCPU:    resource.MustParse(fmt.Sprintf("%dm", utils.RandomNumber(5, 200))),   // Request 500 milliCPUs
+			corev1.ResourceMemory: resource.MustParse(fmt.Sprintf("%dMi", utils.RandomNumber(10, 400))), // Request 1 GiB of memory
 		},
 	}
 	execTime := utils.RandomNumber(2, 100)
@@ -154,7 +154,7 @@ func createPod(id string) *corev1.Pod {
 			Containers: []corev1.Container{
 				{
 					Name:      "task",
-					Image:     "alpine@sha256:6ce9a9a256a3495ae60ab0059ed1c7aee5ee89450477f2223f6ea7f6296df555",
+					Image:     "alpine:3.19.0",
 					Command:   []string{"/bin/sh"},
 					Args:      []string{"-c", fmt.Sprintf("sleep %d && exit 0", execTime)},
 					Resources: resourceRequirements,
