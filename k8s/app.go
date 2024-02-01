@@ -14,11 +14,6 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-var (
-// kubeConfigFilename = "kube-config.yml"
-// available_colors   = [3]string{"red", "green", "blue"}
-)
-
 type K8sAppClient struct {
 	clientset *kubernetes.Clientset
 }

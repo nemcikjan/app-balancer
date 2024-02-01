@@ -52,11 +52,6 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    # strategy:
-    #   matrix:
-    #     arch:
-    #       - amd64
-    #       - arm64v8
     permissions:
       contents: read
       packages: write

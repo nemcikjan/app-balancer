@@ -13,8 +13,8 @@ import (
 )
 
 var (
-	port         = flag.Int("port", 50053, "The server port")
-	k8sClient, _ = k8s.NewK8sAppClient()
+	port = flag.Int("port", 50053, "The server port")
+	// k8sClient, _ = k8s.NewK8sAppClient()
 )
 
 // server is used to implement helloworld.GreeterServer.
@@ -25,14 +25,14 @@ type server struct {
 // SayHello implements helloworld.GreeterServer
 func (s *server) UpdateSpeed(ctx context.Context, in *pb.UpdatePodSpeed) (*pb.Result, error) {
 	log.Printf("Received: %v, %f", in.GetId(), in.GetSpeed())
-	k8sClient.UpdateApp(in.GetId(), in.GetSpeed())
+	// k8sClient.UpdateApp(in.GetId(), in.GetSpeed())
 	return &pb.Result{Message: "OK"}, nil
 }
 
 // SayHello implements helloworld.GreeterServer
 func (s *server) CreateApp(ctx context.Context, in *pb.CreatePodApp) (*pb.Result, error) {
 	log.Printf("Received: %v", in.GetId())
-	k8sClient.CreateApp(in.GetId())
+	k8s.CreatePodRequest(in.GetId())
 	return &pb.Result{Message: "OK"}, nil
 }
 

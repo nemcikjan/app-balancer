@@ -35,8 +35,11 @@ spec:
       serviceAccountName: frico
       containers:
         - name: balancer
-          image: ghcr.io/nemcikjan/app-balancer:v20240117-c3dd524
+          image: ghcr.io/nemcikjan/app-balancer:v20240118-06a910f
           imagePullPolicy: IfNotPresent
+          env:
+            - name: EAODA_URL
+              value: http://frico-webhook.frico.svc
           # readinessProbe:
           #   httpGet:
           #     path: /health
