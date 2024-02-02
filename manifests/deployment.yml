@@ -37,11 +37,11 @@ spec:
         type: management
       containers:
         - name: balancer
-          image: ghcr.io/nemcikjan/app-balancer:v20240201-fa69e21
+          image: ghcr.io/nemcikjan/app-balancer:v20240202-2fd514b
           imagePullPolicy: IfNotPresent
           env:
             - name: EAODA_URL
-              value: http://eaoda-controller.frico.svc.cluster.local:8080/create
+              value: http://10.43.112.69:8080/create
           # readinessProbe:
           #   httpGet:
           #     path: /health

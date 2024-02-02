@@ -32,7 +32,7 @@ func (s *server) UpdateSpeed(ctx context.Context, in *pb.UpdatePodSpeed) (*pb.Re
 // SayHello implements helloworld.GreeterServer
 func (s *server) CreateApp(ctx context.Context, in *pb.CreatePodApp) (*pb.Result, error) {
 	log.Printf("Received: %v", in.GetId())
-	k8s.CreatePodRequest(in.GetId())
+	go k8s.CreatePodRequest(in.GetId())
 	return &pb.Result{Message: "OK"}, nil
 }
 
