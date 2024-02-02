@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/nemcikjan/app-balancer/utils"
 )
@@ -49,7 +50,9 @@ func CreatePodRequest(id string) []byte {
 	req.Header.Set("Content-Type", "application/json")
 
 	// Create an HTTP client and send the request
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: time.Second * 60,
+	}
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatalf("Error sending request: %v", err)

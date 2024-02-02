@@ -22,7 +22,7 @@ metadata:
   namespace: frico
   name: balancer
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: app-balancer
@@ -33,13 +33,15 @@ spec:
       name: balancer
     spec:
       serviceAccountName: frico
+      nodeSelector:
+        type: management
       containers:
         - name: balancer
-          image: ghcr.io/nemcikjan/app-balancer:v20240118-06a910f
+          image: ghcr.io/nemcikjan/app-balancer:v20240201-fa69e21
           imagePullPolicy: IfNotPresent
           env:
             - name: EAODA_URL
-              value: http://frico-webhook.frico.svc
+              value: http://eaoda-controller.frico.svc.cluster.local:8080/create
           # readinessProbe:
           #   httpGet:
           #     path: /health
