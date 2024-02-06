@@ -22,7 +22,7 @@ metadata:
   namespace: frico
   name: balancer
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: app-balancer
@@ -33,15 +33,22 @@ spec:
       name: balancer
     spec:
       serviceAccountName: frico
-      nodeSelector:
-        type: management
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: app-balancer
+          matchLabelKeys:
+            - pod-template-hash
       containers:
         - name: balancer
-          image: ghcr.io/nemcikjan/app-balancer:v20240202-2fd514b
+          image: ghcr.io/nemcikjan/app-balancer:v20240202-1c0fdfd
           imagePullPolicy: IfNotPresent
           env:
             - name: EAODA_URL
-              value: http://10.43.112.69:8080/create
+              value: http://eaoda-controller:8080/create
           # readinessProbe:
           #   httpGet:
           #     path: /health
