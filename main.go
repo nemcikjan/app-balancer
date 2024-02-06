@@ -1,52 +1,62 @@
 package main
 
 import (
-	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"log"
-	"net"
+	"net/http"
 
-	pb "github.com/nemcikjan/app-balancer/grpc"
 	"github.com/nemcikjan/app-balancer/k8s"
-	"google.golang.org/grpc"
 )
 
 var (
 	port = flag.Int("port", 50053, "The server port")
-	// k8sClient, _ = k8s.NewK8sAppClient()
 )
 
-// server is used to implement helloworld.GreeterServer.
-type server struct {
-	pb.UnimplementedAppBalancerServer
+type PostData struct {
+	Id string `json:"id"`
 }
 
-// SayHello implements helloworld.GreeterServer
-func (s *server) UpdateSpeed(ctx context.Context, in *pb.UpdatePodSpeed) (*pb.Result, error) {
-	log.Printf("Received: %v, %f", in.GetId(), in.GetSpeed())
-	// k8sClient.UpdateApp(in.GetId(), in.GetSpeed())
-	return &pb.Result{Message: "OK"}, nil
-}
+func handlePost(w http.ResponseWriter, r *http.Request) {
 
-// SayHello implements helloworld.GreeterServer
-func (s *server) CreateApp(ctx context.Context, in *pb.CreatePodApp) (*pb.Result, error) {
-	log.Printf("Received: %v", in.GetId())
-	go k8s.CreatePodRequest(in.GetId())
-	return &pb.Result{Message: "OK"}, nil
+	// Ensure it's a POST request
+	if r.Method != "POST" {
+		http.Error(w, "Only POST method is accepted", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var postData PostData
+	// Read the body of the request
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Error reading request body", http.StatusInternalServerError)
+		return
+	}
+	defer r.Body.Close()
+
+	// Unmarshal the JSON data into the struct
+	if err := json.Unmarshal(body, &postData); err != nil {
+		http.Error(w, "Error parsing JSON data", http.StatusBadRequest)
+		return
+	}
+
+	// Convert the body to a string and print it
+	fmt.Printf("Received: %s\n", string(body))
+
+	res := k8s.CreatePodRequest(postData.Id)
+
+	// Respond to the client
+	w.WriteHeader(http.StatusOK)
+	w.Write(res)
 }
 
 func main() {
 	flag.Parse()
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-
-	s := grpc.NewServer()
-	pb.RegisterAppBalancerServer(s, &server{})
-	log.Printf("server listening at %v", lis.Addr())
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+	http.HandleFunc("/create", handlePost)
+	fmt.Println("Server starting on port 8080...")
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", *port), nil); err != nil {
+		log.Fatal(err)
 	}
 }

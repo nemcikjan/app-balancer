@@ -14,6 +14,21 @@ spec:
       port: 50053
   type: NodePort
 ---
+kind: Service
+apiVersion: v1
+metadata:
+  name: app-balancer
+  namespace: frico
+  labels:
+    app: balancer
+spec:
+  selector:
+    app: app-balancer
+  ports:
+    - name: http
+      protocol: TCP
+      port: 50053
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -33,22 +48,13 @@ spec:
       name: balancer
     spec:
       serviceAccountName: frico
-      topologySpreadConstraints:
-        - maxSkew: 1
-          topologyKey: kubernetes.io/hostname
-          whenUnsatisfiable: DoNotSchedule
-          labelSelector:
-            matchLabels:
-              app: app-balancer
-          matchLabelKeys:
-            - pod-template-hash
       containers:
         - name: balancer
-          image: ghcr.io/nemcikjan/app-balancer:v20240202-1c0fdfd
+          image: ghcr.io/nemcikjan/app-balancer:v20240206-3aa969f
           imagePullPolicy: IfNotPresent
           env:
             - name: EAODA_URL
-              value: http://eaoda-controller:8080/create
+              value: http://balancer-controller:8080/create
           # readinessProbe:
           #   httpGet:
           #     path: /health
